@@ -163,7 +163,6 @@
 
   .claim-preview__actions {
     align-self: flex-end;
-    margin-top: 0;
     margin-bottom: auto;
     justify-content: flex-end;
     width: auto;
@@ -306,6 +305,15 @@
 
   &:not(:first-of-type) {
     margin-top: var(--spacing-xl);
+  }
+}
+
+.claim-grid__title--first {
+  text-align: center;
+  width: 100%;
+
+  .no-evil {
+    font-size: var(--font-heading);
   }
 }
 

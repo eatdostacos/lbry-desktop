@@ -1,6 +1,6 @@
 // @flow
 import * as ICONS from 'constants/icons';
-import { SETTINGS } from 'lbry-redux';
+// import { SETTINGS } from 'lbry-redux';
 import * as PAGES from 'constants/pages';
 import React from 'react';
 import { withRouter } from 'react-router';
@@ -21,6 +21,7 @@ import NotificationHeaderButton from 'component/notificationHeaderButton';
 import { remote } from 'electron';
 import { IS_MAC } from 'component/app/view';
 // @endif
+import OdyseeLogo from './odysee_logo.png';
 
 type Props = {
   balance: string,
@@ -66,9 +67,9 @@ const Header = (props: Props) => {
   const {
     roundedBalance,
     history,
-    setClientSetting,
-    currentTheme,
-    automaticDarkModeEnabled,
+    // setClientSetting,
+    // currentTheme,
+    // automaticDarkModeEnabled,
     hideBalance,
     email,
     authenticated,
@@ -143,18 +144,18 @@ const Header = (props: Props) => {
     }
   }, [hasBackout]);
 
-  function handleThemeToggle() {
-    if (automaticDarkModeEnabled) {
-      setClientSetting(SETTINGS.AUTOMATIC_DARK_MODE_ENABLED, false);
-    }
+  //   function handleThemeToggle() {
+  //     if (automaticDarkModeEnabled) {
+  //       setClientSetting(SETTINGS.AUTOMATIC_DARK_MODE_ENABLED, false);
+  //     }
 
-    if (currentTheme === 'dark') {
-      setClientSetting(SETTINGS.THEME, 'light');
-    } else {
-      setClientSetting(SETTINGS.THEME, 'dark');
-    }
-    syncSettings();
-  }
+  //     if (currentTheme === 'dark') {
+  //       setClientSetting(SETTINGS.THEME, 'light');
+  //     } else {
+  //       setClientSetting(SETTINGS.THEME, 'dark');
+  //     }
+  //     syncSettings();
+  //   }
 
   function getWalletTitle() {
     return hideBalance || Number(roundedBalance) === 0 ? (
@@ -219,6 +220,16 @@ const Header = (props: Props) => {
               )}
               <Button
                 className="header__navigation-item header__navigation-item--lbry header__navigation-item--button-mobile"
+                onClick={() => {
+                  if (history.location.pathname === '/') window.location.reload();
+                }}
+                {...homeButtonNavigationProps}
+              >
+                <img src={OdyseeLogo} className="header__odysee" />
+              </Button>
+
+              {/* <Button
+                className="header__navigation-item header__navigation-item--lbry header__navigation-item--button-mobile"
                 // @if TARGET='app'
                 label={'LBRY'}
                 // @endif
@@ -235,7 +246,7 @@ const Header = (props: Props) => {
                 }}
                 // @endif
                 {...homeButtonNavigationProps}
-              />
+              /> */}
 
               {!authHeader && (
                 <div className="header__center">
@@ -315,14 +326,14 @@ const Header = (props: Props) => {
                           <Icon aria-hidden icon={ICONS.ANALYTICS} />
                           {__('Creator Analytics')}
                         </MenuLink>
-                        <MenuLink className="menu__link" as="a" onSelect={() => history.push(`/$/${PAGES.REWARDS}`)}>
+                        {/* <MenuLink className="menu__link" as="a" onSelect={() => history.push(`/$/${PAGES.REWARDS}`)}>
                           <Icon aria-hidden icon={ICONS.REWARDS} />
                           {__('Rewards')}
                         </MenuLink>
                         <MenuLink className="menu__link" as="a" onSelect={() => history.push(`/$/${PAGES.INVITE}`)}>
                           <Icon aria-hidden icon={ICONS.INVITE} />
                           {__('Invites')}
-                        </MenuLink>
+                        </MenuLink> */}
 
                         {authenticated ? (
                           <MenuItem onSelect={IS_WEB ? signOut : openSignOutModal}>
@@ -357,10 +368,10 @@ const Header = (props: Props) => {
                           <Icon aria-hidden icon={ICONS.HELP} />
                           {__('Help')}
                         </MenuItem>
-                        <MenuItem className="menu__link" onSelect={handleThemeToggle}>
+                        {/* <MenuItem className="menu__link" onSelect={handleThemeToggle}>
                           <Icon icon={currentTheme === 'light' ? ICONS.DARK : ICONS.LIGHT} />
                           {currentTheme === 'light' ? __('Dark') : __('Light')}
-                        </MenuItem>
+                        </MenuItem> */}
                       </MenuList>
                     </Menu>
                   </div>

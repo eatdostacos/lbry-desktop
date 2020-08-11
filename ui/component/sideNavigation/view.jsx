@@ -6,6 +6,8 @@ import React from 'react';
 import Button from 'component/button';
 import classnames from 'classnames';
 import NotificationBubble from 'component/notificationBubble';
+import { PINNED_LABEL_1, PINNED_URI_1, PINNED_URI_2, PINNED_LABEL_2 } from 'config';
+import { EXTRA_SIDEBAR_LINKS } from 'homepage';
 
 const ESCAPE_KEY_CODE = 27;
 const BACKSLASH_KEY_CODE = 220;
@@ -240,6 +242,7 @@ function SideNavigation(props: Props) {
                 <li key={linkProps.navigate}>
                   <Button
                     {...linkProps}
+                    navigate={linkProps.route || linkProps.navigate}
                     icon={pulseLibrary && linkProps.icon === ICONS.LIBRARY ? ICONS.PURCHASED : linkProps.icon}
                     className={classnames('navigation-link', {
                       'navigation-link--pulse': linkProps.icon === ICONS.LIBRARY && pulseLibrary,
