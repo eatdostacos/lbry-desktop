@@ -39,10 +39,10 @@ function Page(props: Props) {
     className,
     authPage = false,
     filePage = false,
+    homePage = false,
     noHeader = false,
     noFooter = false,
     noSideNavigation = false,
-
     backout,
   } = props;
   const {
@@ -89,7 +89,11 @@ function Page(props: Props) {
           />
         )}
         <main
-          className={classnames(MAIN_CLASS, className, { 'main--full-width': authPage, 'main--file-page': filePage })}
+          className={classnames(MAIN_CLASS, className, {
+            'main--full-width': authPage,
+            'main--file-page': filePage,
+            'main--homepage': homePage,
+          })}
         >
           {children}
         </main>

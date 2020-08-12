@@ -1,3 +1,4 @@
+// Widths are taken from "ui/scss/init/vars.scss"
 import useMedia from './use-media';
 
 export function useIsMobile() {
@@ -6,6 +7,11 @@ export function useIsMobile() {
 }
 
 export function useIsMediumScreen() {
-  const isMobile = useMedia(['(min-width: 1151px)'], [false], true);
-  return isMobile;
+  const isMedium = useMedia(['(min-width: 1151px)'], [false], true);
+  return isMedium;
+}
+
+export function useIsLargeScreen() {
+  const isLarge = useMedia(['(min-width: 1601px)'], [false], true);
+  return !isLarge;
 }

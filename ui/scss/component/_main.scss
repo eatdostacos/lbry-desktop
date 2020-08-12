@@ -89,6 +89,14 @@
   }
 }
 
+.main--homepage {
+  @extend .main;
+
+  @media (max-width: $breakpoint-large) {
+    max-width: none;
+  }
+}
+
 .main--auth-page {
   max-width: 70rem;
   margin-top: var(--spacing-main-padding);
