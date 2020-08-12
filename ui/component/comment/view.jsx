@@ -15,6 +15,8 @@ import { FormField, Form } from 'component/common/form';
 import CommentCreate from 'component/commentCreate';
 import classnames from 'classnames';
 import usePersistedState from 'effects/use-persisted-state';
+import CommentsReplies from 'component/commentsReplies';
+import scrollIntoView from 'dom-scroll-into-view';
 
 type Props = {
   uri: string,
@@ -34,6 +36,9 @@ type Props = {
   updateComment: (string, string) => void,
   deleteComment: string => void,
   blockChannel: string => void,
+  highlighted: boolean,
+  scrollto: boolean,
+  reply: boolean,
 };
 
 const LENGTH_TO_COLLAPSE = 300;
@@ -57,6 +62,8 @@ function Comment(props: Props) {
     updateComment,
     deleteComment,
     blockChannel,
+    highlighted,
+    scrollto,
   } = props;
 
   const [isEditing, setEditing] = useState(false);
@@ -75,6 +82,7 @@ function Comment(props: Props) {
   const shouldFetch =
     channel === undefined ||
     (channel !== null && channel.value_type === 'channel' && isEmpty(channel.meta) && !pending);
+  const comment = document.getElementById(commentId);
 
   useEffect(() => {
     // If author was extracted from the URI, then it must be valid.
@@ -113,10 +121,20 @@ function Comment(props: Props) {
 
   return (
     <li
-      className={classnames('comment', { comment__reply: parentId !== null })}
+      className={classnames('comment', { comment__reply: parentId !== null, comment__highlighted: highlighted })}
+      id={scrollto ? commentId + 'linked' : commentId}
       onMouseOver={() => setMouseHover(true)}
       onMouseOut={() => setMouseHover(false)}
     >
+      {scrollto && (
+        <Button
+          button={'link'}
+          className={'comment__highlighted-title'}
+          label={'Highlighed Comment'}
+          onClick={() => comment.scrollIntoView()}
+          icon={ICONS.DOWN}
+        />
+      )}
       <div className="comment__author-thumbnail">
         {authorUri ? <ChannelThumbnail uri={authorUri} obscure={channelIsBlocked} small /> : <ChannelThumbnail small />}
       </div>
@@ -191,9 +209,9 @@ function Comment(props: Props) {
             </Form>
           ) : editedMessage.length >= LENGTH_TO_COLLAPSE ? (
             <div className="comment__message">
-              <Expandable>
-                <MarkdownPreview content={message} />
-              </Expandable>
+              {/*<Expandable>*/}
+              <MarkdownPreview content={message} />
+              {/*</Expandable>*/}
             </div>
           ) : (
             <div className="comment__message">
@@ -201,15 +219,35 @@ function Comment(props: Props) {
             </div>
           )}
         </div>
-        {!parentId && !isEditing && (
-          <Button
-            button="link"
-            requiresAuth={IS_WEB}
-            className="comment__reply-button"
-            onClick={() => setReplying(true)}
-            label={__('Reply')}
-          />
-        )}
+        <div className="comment__actions">
+          {!parentId && !isEditing && (
+            <Button
+              button="primary"
+              requiresAuth={IS_WEB}
+              className="comment__action"
+              onClick={() => setReplying(true)}
+              label={__('Reply')}
+            />
+          )}
+          {!parentId && !isEditing && (
+            <Button
+              button="primary"
+              requiresAuth={IS_WEB}
+              className="comment__action"
+              onClick={() => alert('sycophant')}
+              icon={ICONS.UP}
+            />
+          )}
+          {!parentId && !isEditing && (
+            <Button
+              button="primary"
+              requiresAuth={IS_WEB}
+              className="comment__action"
+              onClick={() => alert('terrible')}
+              icon={ICONS.DOWN}
+            />
+          )}
+        </div>
         <div>
           {isReplying ? (
             <CommentCreate
@@ -222,6 +260,7 @@ function Comment(props: Props) {
             ''
           )}
         </div>
+        <CommentsReplies uri={uri} parentId={commentId} />
       </div>
     </li>
   );

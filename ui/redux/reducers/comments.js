@@ -5,6 +5,8 @@ import { handleActions } from 'util/redux-utils';
 const defaultState: CommentsState = {
   commentById: {}, // commentId -> Comment
   byId: {}, // ClaimID -> list of comments
+  repliesByParentId: {}, // ParentCommentID -> list of reply comments
+  topLevelCommentsById: {}, // ClaimID -> list of top level comments
   commentsByUri: {}, // URI -> claimId
   isLoading: false,
   myComments: undefined,
@@ -51,8 +53,11 @@ export default handleActions(
 
       const commentById = Object.assign({}, state.commentById);
       const byId = Object.assign({}, state.byId);
+      const topLevelCommentsById = Object.assign({}, state.topLevelCommentsById); // was byId {ClaimId -> [commentIds...]}
       const commentsByUri = Object.assign({}, state.commentsByUri);
 
+      const tempRepliesByParent = {};
+      const topLevelComments = [];
       if (comments) {
         // we use an Array to preserve order of listing
         // in reality this doesn't matter and we can just
@@ -61,15 +66,32 @@ export default handleActions(
 
         // map the comment_ids to the new comments
         for (let i = 0; i < comments.length; i++) {
+          const comment = comments[i];
+          if (comment['parent_id']) {
+            if (!tempRepliesByParent[comment.parent_id]) {
+              tempRepliesByParent[comment.parent_id] = [comment.comment_id];
+            } else {
+              tempRepliesByParent[comment.parent_id].push(comment.comment_id);
+            }
+          } else {
+            commentById[comment.comment_id] = comment;
+            topLevelComments.push(comment.comment_id);
+          }
           commentIds[i] = comments[i].comment_id;
           commentById[commentIds[i]] = comments[i];
         }
+        topLevelCommentsById[claimId] = topLevelComments;
 
         byId[claimId] = commentIds;
         commentsByUri[uri] = claimId;
       }
+
+      const repliesByParentId = Object.assign({}, state.repliesByParentId, tempRepliesByParent); // {ParentCommentID -> [commentIds...] } list of reply comments
+
       return {
         ...state,
+        topLevelCommentsById,
+        repliesByParentId,
         byId,
         commentById,
         commentsByUri,

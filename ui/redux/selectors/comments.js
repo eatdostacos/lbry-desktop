@@ -29,6 +29,43 @@ export const selectCommentsByClaimId = createSelector(selectState, selectComment
   return comments;
 });
 
+export const selectTopLevelCommentsByClaimId = createSelector(selectState, selectCommentsById, (state, byId) => {
+  const byClaimId = state.topLevelCommentsById || {};
+  const comments = {};
+
+  // replace every comment_id in the list with the actual comment object
+  Object.keys(byClaimId).forEach(claimId => {
+    const commentIds = byClaimId[claimId];
+
+    comments[claimId] = Array(commentIds === null ? 0 : commentIds.length);
+    for (let i = 0; i < commentIds.length; i++) {
+      comments[claimId][i] = byId[commentIds[i]];
+    }
+  });
+
+  return comments;
+});
+
+export const makeSelectCommentForCommentId = commentId =>
+  createSelector(selectCommentsById, comments => comments[commentId]);
+
+export const selectRepliesByParentId = createSelector(selectState, selectCommentsById, (state, byId) => {
+  const byParentId = state.repliesByParentId || {};
+  const comments = {};
+
+  // replace every comment_id in the list with the actual comment object
+  Object.keys(byParentId).forEach(id => {
+    const commentIds = byParentId[id];
+
+    comments[id] = Array(commentIds === null ? 0 : commentIds.length);
+    for (let i = 0; i < commentIds.length; i++) {
+      comments[id][i] = byId[commentIds[i]];
+    }
+  });
+
+  return comments;
+});
+
 // previously this used a mapping from claimId -> Array<Comments>
 /* export const selectCommentsById = createSelector(
   selectState,
@@ -119,5 +156,159 @@ export const makeSelectCommentsForUri = (uri: string) =>
             return !blockedChannels.includes(comment.channel_url);
           })
         : [];
+    }
+  );
+
+export const makeSelectTopLevelCommentsForUri = (uri: string) =>
+  createSelector(
+    selectTopLevelCommentsByClaimId,
+    selectCommentsByUri,
+    selectClaimsById,
+    selectMyActiveClaims,
+    selectBlockedChannels,
+    selectBlackListedOutpoints,
+    selectFilteredOutpoints,
+    makeSelectClientSetting(SETTINGS.SHOW_MATURE),
+    (
+      byClaimId,
+      byUri,
+      claimsById,
+      myClaims,
+      blockedChannels,
+      blacklistedOutpoints,
+      filteredOutpoints,
+      showMatureContent
+    ) => {
+      const claimId = byUri[uri];
+      const comments = byClaimId && byClaimId[claimId];
+      const blacklistedMap = blacklistedOutpoints
+        ? blacklistedOutpoints.reduce((acc, val) => {
+            const outpoint = `${val.txid}:${val.nout}`;
+            return {
+              ...acc,
+              [outpoint]: 1,
+            };
+          }, {})
+        : {};
+      const filteredMap = filteredOutpoints
+        ? filteredOutpoints.reduce((acc, val) => {
+            const outpoint = `${val.txid}:${val.nout}`;
+            return {
+              ...acc,
+              [outpoint]: 1,
+            };
+          }, {})
+        : {};
+
+      return comments
+        ? comments.filter(comment => {
+            const channelClaim = claimsById[comment.channel_id];
+
+            // Return comment if `channelClaim` doesn't exist so the component knows to resolve the author
+            if (channelClaim) {
+              if (myClaims && myClaims.size > 0) {
+                const claimIsMine = channelClaim.is_my_output || myClaims.has(channelClaim.claim_id);
+                if (claimIsMine) {
+                  return true;
+                }
+              }
+
+              const outpoint = `${channelClaim.txid}:${channelClaim.nout}`;
+              if (blacklistedMap[outpoint] || filteredMap[outpoint]) {
+                return false;
+              }
+
+              if (!showMatureContent) {
+                const claimIsMature = isClaimNsfw(channelClaim);
+                if (claimIsMature) {
+                  return false;
+                }
+              }
+            }
+
+            return !blockedChannels.includes(comment.channel_url);
+          })
+        : [];
+    }
+  );
+
+export const makeSelectRepliesForParentId = (id: string) =>
+  createSelector(
+    selectState, // no selectRepliesByParentId
+    selectCommentsById,
+    selectClaimsById,
+    selectMyActiveClaims,
+    selectBlockedChannels,
+    selectBlackListedOutpoints,
+    selectFilteredOutpoints,
+    makeSelectClientSetting(SETTINGS.SHOW_MATURE),
+    (
+      state,
+      commentsById,
+      claimsById,
+      myClaims,
+      blockedChannels,
+      blacklistedOutpoints,
+      filteredOutpoints,
+      showMatureContent
+    ) => {
+      // const claimId = byUri[uri]; // just parentId (id)
+      const replyIdsByParentId = state.repliesByParentId;
+      const replyIdsForParent = replyIdsByParentId[id] || [];
+      if (!replyIdsForParent.length) return null;
+
+      const comments = [];
+      replyIdsForParent.forEach(cid => {
+        comments.push(commentsById[cid]);
+      });
+      // const comments = byParentId && byParentId[id];
+      const blacklistedMap = blacklistedOutpoints
+        ? blacklistedOutpoints.reduce((acc, val) => {
+            const outpoint = `${val.txid}:${val.nout}`;
+            return {
+              ...acc,
+              [outpoint]: 1,
+            };
+          }, {})
+        : {};
+      const filteredMap = filteredOutpoints
+        ? filteredOutpoints.reduce((acc, val) => {
+            const outpoint = `${val.txid}:${val.nout}`;
+            return {
+              ...acc,
+              [outpoint]: 1,
+            };
+          }, {})
+        : {};
+
+      return comments;
+      // ? comments.filter(comment => {
+      //   const channelClaim = claimsById[comment.channel_id];
+      //
+      //   // Return comment if `channelClaim` doesn't exist so the component knows to resolve the author
+      //   if (channelClaim) {
+      //     if (myClaims && myClaims.size > 0) {
+      //       const claimIsMine = channelClaim.is_my_output || myClaims.has(channelClaim.claim_id);
+      //       if (claimIsMine) {
+      //         return true;
+      //       }
+      //     }
+      //
+      //     const outpoint = `${channelClaim.txid}:${channelClaim.nout}`;
+      //     if (blacklistedMap[outpoint] || filteredMap[outpoint]) {
+      //       return false;
+      //     }
+      //
+      //     if (!showMatureContent) {
+      //       const claimIsMature = isClaimNsfw(channelClaim);
+      //       if (claimIsMature) {
+      //         return false;
+      //       }
+      //     }
+      //   }
+      //
+      //   return !blockedChannels.includes(comment.channel_url);
+      // })
+      // : [];
     }
   );
