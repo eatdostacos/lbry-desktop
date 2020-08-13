@@ -21,6 +21,7 @@ type Props = {
   isUpgradeAvailable: boolean,
   authPage: boolean,
   filePage: boolean,
+  homePage: boolean,
   noHeader: boolean,
   noFooter: boolean,
   noSideNavigation: boolean,
@@ -50,6 +51,7 @@ function Page(props: Props) {
   } = useHistory();
   const [sidebarOpen, setSidebarOpen] = usePersistedState('sidebar', true);
   const isMediumScreen = useIsMediumScreen();
+
   const isMobile = useIsMobile();
   let isOnFilePage = false;
   try {

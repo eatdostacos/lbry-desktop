@@ -4,7 +4,7 @@ import * as CS from 'constants/claim_search';
 import { parseURI } from 'lbry-redux';
 import moment from 'moment';
 import { toCapitalCase } from 'util/string';
-import { useIsLargeScreen } from 'effects/use-screensize';
+import { useIsLargeScreen, useIsMediumScreen } from 'effects/use-screensize';
 
 type RowDataItem = {
   title: string,

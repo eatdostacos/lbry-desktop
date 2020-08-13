@@ -92,8 +92,10 @@
 .main--homepage {
   @extend .main;
 
-  @media (max-width: $breakpoint-large) {
+  @media (min-width: $breakpoint-large) {
     max-width: none;
+    width: 100%;
+    padding: 0 var(--spacing-l);
   }
 }
 
