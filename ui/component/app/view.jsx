@@ -30,6 +30,7 @@ import Card from 'component/common/card';
 import Button from 'component/button';
 import { Form, FormField } from 'component/common/form';
 import { ODYSEE_PASSWORD } from 'config';
+import { setCookie, getCookie } from 'util/saved-passwords';
 
 import {
   useDegradedPerformance,
@@ -110,7 +111,7 @@ function App(props: Props) {
     isAuthenticated,
   } = props;
 
-  const [isVip, setIsVip] = React.useState(false);
+  const [isVip, setIsVip] = React.useState(getCookie('odysee'));
   const [password, setPassword] = React.useState('');
   const appRef = useRef();
   const isEnhancedLayout = useKonamiListener();
@@ -297,6 +298,7 @@ function App(props: Props) {
               <Form
                 onSubmit={() => {
                   if (password === ODYSEE_PASSWORD) {
+                    setCookie('odysee', password);
                     setIsVip(true);
                   }
                 }}
