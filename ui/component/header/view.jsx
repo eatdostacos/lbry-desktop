@@ -22,6 +22,7 @@ import { remote } from 'electron';
 import { IS_MAC } from 'component/app/view';
 // @endif
 import OdyseeLogo from './odysee_logo.png';
+import OdyseeLogoWithText from './odysee.png';
 
 type Props = {
   balance: string,
@@ -61,6 +62,7 @@ type Props = {
   sidebarOpen: boolean,
   setSidebarOpen: boolean => void,
   isAbsoluteSideNavHidden: boolean,
+  hideCancel: boolean,
 };
 
 const Header = (props: Props) => {
@@ -85,6 +87,7 @@ const Header = (props: Props) => {
     sidebarOpen,
     setSidebarOpen,
     isAbsoluteSideNavHidden,
+    hideCancel,
   } = props;
   const isMobile = useIsMobile();
   // on the verify page don't let anyone escape other than by closing the tab to keep session data consistent
@@ -225,7 +228,8 @@ const Header = (props: Props) => {
                 }}
                 {...homeButtonNavigationProps}
               >
-                <img src={OdyseeLogo} className="header__odysee" />
+                <img src={OdyseeLogo} className="header__odysee mobile-only" />
+                <img src={OdyseeLogoWithText} className="header__odysee mobile-hidden" />
               </Button>
 
               {/* <Button
@@ -383,6 +387,7 @@ const Header = (props: Props) => {
               <div className={classnames('header__menu', { 'header__menu--with-balance': !IS_WEB || authenticated })}>
                 {(!IS_WEB || authenticated) && (
                   <Button
+                    button="link"
                     aria-label={__('Your wallet')}
                     navigate={`/$/${PAGES.WALLET}`}
                     className="header__navigation-item menu__title header__navigation-item--balance"
@@ -403,7 +408,8 @@ const Header = (props: Props) => {
                 )}
               </div>
             ) : (
-              !isVerifyPage && (
+              !isVerifyPage &&
+              !hideCancel && (
                 <div className="header__menu">
                   {/* Add an empty span here so we can use the same style as above */}
                   {/* This pushes the close button to the right side */}

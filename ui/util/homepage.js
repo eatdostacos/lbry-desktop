@@ -138,7 +138,7 @@ export const PRIMARY_CONTENT = {
   options: {
     claimType: ['stream'],
     orderBy: ['release_time'],
-    pageSize: 8,
+    pageSize: 20, // temporary, to facilitate screenshots until repitition parameter is added
     channelIds: PRIMARY_CONTENT_CHANNEL_IDS,
     releaseTime: `>${Math.floor(
       moment()

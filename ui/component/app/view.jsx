@@ -25,6 +25,11 @@ import OpenInAppLink from 'web/component/openInAppLink';
 import YoutubeWelcome from 'web/component/youtubeReferralWelcome';
 import NagDegradedPerformance from 'web/component/nag-degraded-performance';
 import NagDataCollection from 'web/component/nag-data-collection';
+import Header from 'component/header';
+import Card from 'component/common/card';
+import Button from 'component/button';
+import { Form, FormField } from 'component/common/form';
+import { ODYSEE_PASSWORD } from 'config';
 
 import {
   useDegradedPerformance,
@@ -105,6 +110,8 @@ function App(props: Props) {
     isAuthenticated,
   } = props;
 
+  const [isVip, setIsVip] = React.useState(false);
+  const [password, setPassword] = React.useState('');
   const appRef = useRef();
   const isEnhancedLayout = useKonamiListener();
   const [hasSignedIn, setHasSignedIn] = useState(false);
@@ -278,6 +285,40 @@ function App(props: Props) {
     return null;
   }
   // @endif
+
+  if (!isVip) {
+    return (
+      <div>
+        <Header authHeader hideCancel />
+        <div className="main--empty" style={{ maxWidth: '30rem', margin: 'auto', marginTop: '10rem' }}>
+          <Card
+            title={'Secrete Password'}
+            actions={
+              <Form
+                onSubmit={() => {
+                  if (password === ODYSEE_PASSWORD) {
+                    setIsVip(true);
+                  }
+                }}
+              >
+                <FormField
+                  style={{ textAlign: 'left' }}
+                  type="password"
+                  name="a"
+                  label="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+                <div className="section__actions">
+                  <Button label="Submit" button="primary" />
+                </div>
+              </Form>
+            }
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

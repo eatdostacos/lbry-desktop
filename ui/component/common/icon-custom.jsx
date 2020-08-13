@@ -35,7 +35,7 @@ const buildIcon = (iconStrokes: React$Node, customSvgValues = {}) =>
 
 export const icons = {
   // The LBRY icon is different from the base icon set so don't use buildIcon()
-  //   [ICONS.LBRY]: () => (
+  //   [ICONS.LBRY]: (props) => (
   //     <svg stroke="currentColor" fill="currentColor" x="0px" y="0px" viewBox="0 0 322 254" className="icon lbry-icon">
   //       <path d="M296,85.9V100l-138.8,85.3L52.6,134l0.2-7.9l104,51.2L289,96.1v-5.8L164.2,30.1L25,116.2v38.5l131.8,65.2 l137.6-84.4l3.9,6l-141.1,86.4L18.1,159.1v-46.8l145.8-90.2C163.9,22.1,296,85.9,296,85.9z" />
   //       <path d="M294.3,150.9l2-12.6l-12.2-2.1l0.8-4.9l17.1,2.9l-2.8,17.5L294.3,150.9L294.3,150.9z" />
@@ -279,8 +279,9 @@ export const icons = {
       <line x1="7" y1="7" x2="7" y2="7" />
     </g>
   ),
-  [ICONS.SUPPORT]: () => (
+  [ICONS.SUPPORT]: props => (
     <svg
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 -1 24 26"
       width="22"
@@ -769,9 +770,9 @@ export const icons = {
       <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
     </g>
   ),
-  [ICONS.TECH]: () => (
+  [ICONS.TECH]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-5 0 24 24"
       width="16"
@@ -795,9 +796,9 @@ export const icons = {
       />
     </svg>
   ),
-  [ICONS.NEWS]: () => (
+  [ICONS.NEWS]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       width="16"
@@ -831,9 +832,9 @@ export const icons = {
       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
     </g>
   ),
-  [ICONS.RABBIT_HOLE]: () => (
+  [ICONS.RABBIT_HOLE]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       width="16"
@@ -854,9 +855,9 @@ export const icons = {
       />
     </svg>
   ),
-  [ICONS.ENLIGHTENMENT]: () => (
+  [ICONS.ENLIGHTENMENT]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-1 0 24 24"
       width="16"
@@ -880,9 +881,9 @@ export const icons = {
       />
     </svg>
   ),
-  [ICONS.GAMING]: () => (
+  [ICONS.GAMING]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-2 -1 24 26"
       width="18"
@@ -916,9 +917,9 @@ export const icons = {
       </g>
     </svg>
   ),
-  [ICONS.COMMUNITY]: () => (
+  [ICONS.COMMUNITY]: props => (
     <svg
-      className="icon"
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-2 -1 24 26"
       width="18"
