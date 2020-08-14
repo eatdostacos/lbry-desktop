@@ -36,9 +36,9 @@ type Props = {
   updateComment: (string, string) => void,
   deleteComment: string => void,
   blockChannel: string => void,
-  highlighted: boolean,
   scrollto: boolean,
   reply: boolean,
+  linkedComment?: any,
 };
 
 const LENGTH_TO_COLLAPSE = 300;
@@ -62,8 +62,8 @@ function Comment(props: Props) {
     updateComment,
     deleteComment,
     blockChannel,
-    highlighted,
     scrollto,
+    linkedComment,
   } = props;
 
   const [isEditing, setEditing] = useState(false);
@@ -121,7 +121,10 @@ function Comment(props: Props) {
 
   return (
     <li
-      className={classnames('comment', { comment__reply: parentId !== null, comment__highlighted: highlighted })}
+      className={classnames('comment', {
+        comment__reply: parentId !== null,
+        comment__highlighted: linkedComment && linkedComment.comment_id === commentId,
+      })}
       id={scrollto ? commentId + 'linked' : commentId}
       onMouseOver={() => setMouseHover(true)}
       onMouseOut={() => setMouseHover(false)}
@@ -209,9 +212,9 @@ function Comment(props: Props) {
             </Form>
           ) : editedMessage.length >= LENGTH_TO_COLLAPSE ? (
             <div className="comment__message">
-              {/*<Expandable>*/}
+              {/* <Expandable> */}
               <MarkdownPreview content={message} />
-              {/*</Expandable>*/}
+              {/* </Expandable> */}
             </div>
           ) : (
             <div className="comment__message">
@@ -222,29 +225,29 @@ function Comment(props: Props) {
         <div className="comment__actions">
           {!parentId && !isEditing && (
             <Button
-              button="primary"
+              button="link"
               requiresAuth={IS_WEB}
               className="comment__action"
               onClick={() => setReplying(true)}
-              label={__('Reply')}
+              icon={ICONS.REPLY}
             />
           )}
           {!parentId && !isEditing && (
             <Button
-              button="primary"
+              button="link"
               requiresAuth={IS_WEB}
               className="comment__action"
               onClick={() => alert('sycophant')}
-              icon={ICONS.UP}
+              icon={ICONS.YES}
             />
           )}
           {!parentId && !isEditing && (
             <Button
-              button="primary"
+              button="link"
               requiresAuth={IS_WEB}
               className="comment__action"
               onClick={() => alert('terrible')}
-              icon={ICONS.DOWN}
+              icon={ICONS.NO}
             />
           )}
         </div>
@@ -260,7 +263,7 @@ function Comment(props: Props) {
             ''
           )}
         </div>
-        <CommentsReplies uri={uri} parentId={commentId} />
+        <CommentsReplies uri={uri} parentId={commentId} linkedComment={linkedComment} />
       </div>
     </li>
   );

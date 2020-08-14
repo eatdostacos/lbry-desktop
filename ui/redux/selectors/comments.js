@@ -3,7 +3,7 @@ import * as SETTINGS from 'constants/settings';
 import { createSelector } from 'reselect';
 import { selectBlockedChannels } from 'redux/selectors/blocked';
 import { makeSelectClientSetting } from 'redux/selectors/settings';
-import { selectBlackListedOutpoints, selectFilteredOutpoints } from 'lbryinc';
+import { selectBlacklistedOutpointMap, selectFilteredOutpointMap } from 'lbryinc';
 import { selectClaimsById, isClaimNsfw, selectMyActiveClaims } from 'lbry-redux';
 
 const selectState = state => state.comments || {};
@@ -93,39 +93,12 @@ export const makeSelectCommentsForUri = (uri: string) =>
     selectClaimsById,
     selectMyActiveClaims,
     selectBlockedChannels,
-    selectBlackListedOutpoints,
-    selectFilteredOutpoints,
+    selectBlacklistedOutpointMap,
+    selectFilteredOutpointMap,
     makeSelectClientSetting(SETTINGS.SHOW_MATURE),
-    (
-      byClaimId,
-      byUri,
-      claimsById,
-      myClaims,
-      blockedChannels,
-      blacklistedOutpoints,
-      filteredOutpoints,
-      showMatureContent
-    ) => {
+    (byClaimId, byUri, claimsById, myClaims, blockedChannels, blacklistedMap, filteredMap, showMatureContent) => {
       const claimId = byUri[uri];
       const comments = byClaimId && byClaimId[claimId];
-      const blacklistedMap = blacklistedOutpoints
-        ? blacklistedOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
-      const filteredMap = filteredOutpoints
-        ? filteredOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
 
       return comments
         ? comments.filter(comment => {
@@ -166,39 +139,12 @@ export const makeSelectTopLevelCommentsForUri = (uri: string) =>
     selectClaimsById,
     selectMyActiveClaims,
     selectBlockedChannels,
-    selectBlackListedOutpoints,
-    selectFilteredOutpoints,
+    selectBlacklistedOutpointMap,
+    selectFilteredOutpointMap,
     makeSelectClientSetting(SETTINGS.SHOW_MATURE),
-    (
-      byClaimId,
-      byUri,
-      claimsById,
-      myClaims,
-      blockedChannels,
-      blacklistedOutpoints,
-      filteredOutpoints,
-      showMatureContent
-    ) => {
+    (byClaimId, byUri, claimsById, myClaims, blockedChannels, blacklistedMap, filteredMap, showMatureContent) => {
       const claimId = byUri[uri];
       const comments = byClaimId && byClaimId[claimId];
-      const blacklistedMap = blacklistedOutpoints
-        ? blacklistedOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
-      const filteredMap = filteredOutpoints
-        ? filteredOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
 
       return comments
         ? comments.filter(comment => {
@@ -239,19 +185,10 @@ export const makeSelectRepliesForParentId = (id: string) =>
     selectClaimsById,
     selectMyActiveClaims,
     selectBlockedChannels,
-    selectBlackListedOutpoints,
-    selectFilteredOutpoints,
+    selectBlacklistedOutpointMap,
+    selectFilteredOutpointMap,
     makeSelectClientSetting(SETTINGS.SHOW_MATURE),
-    (
-      state,
-      commentsById,
-      claimsById,
-      myClaims,
-      blockedChannels,
-      blacklistedOutpoints,
-      filteredOutpoints,
-      showMatureContent
-    ) => {
+    (state, commentsById, claimsById, myClaims, blockedChannels, blacklistedMap, filteredMap, showMatureContent) => {
       // const claimId = byUri[uri]; // just parentId (id)
       const replyIdsByParentId = state.repliesByParentId;
       const replyIdsForParent = replyIdsByParentId[id] || [];
@@ -262,53 +199,35 @@ export const makeSelectRepliesForParentId = (id: string) =>
         comments.push(commentsById[cid]);
       });
       // const comments = byParentId && byParentId[id];
-      const blacklistedMap = blacklistedOutpoints
-        ? blacklistedOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
-      const filteredMap = filteredOutpoints
-        ? filteredOutpoints.reduce((acc, val) => {
-            const outpoint = `${val.txid}:${val.nout}`;
-            return {
-              ...acc,
-              [outpoint]: 1,
-            };
-          }, {})
-        : {};
 
-      return comments;
-      // ? comments.filter(comment => {
-      //   const channelClaim = claimsById[comment.channel_id];
-      //
-      //   // Return comment if `channelClaim` doesn't exist so the component knows to resolve the author
-      //   if (channelClaim) {
-      //     if (myClaims && myClaims.size > 0) {
-      //       const claimIsMine = channelClaim.is_my_output || myClaims.has(channelClaim.claim_id);
-      //       if (claimIsMine) {
-      //         return true;
-      //       }
-      //     }
-      //
-      //     const outpoint = `${channelClaim.txid}:${channelClaim.nout}`;
-      //     if (blacklistedMap[outpoint] || filteredMap[outpoint]) {
-      //       return false;
-      //     }
-      //
-      //     if (!showMatureContent) {
-      //       const claimIsMature = isClaimNsfw(channelClaim);
-      //       if (claimIsMature) {
-      //         return false;
-      //       }
-      //     }
-      //   }
-      //
-      //   return !blockedChannels.includes(comment.channel_url);
-      // })
-      // : [];
+      return comments
+        ? comments.filter(comment => {
+            const channelClaim = claimsById[comment.channel_id];
+
+            // Return comment if `channelClaim` doesn't exist so the component knows to resolve the author
+            if (channelClaim) {
+              if (myClaims && myClaims.size > 0) {
+                const claimIsMine = channelClaim.is_my_output || myClaims.has(channelClaim.claim_id);
+                if (claimIsMine) {
+                  return true;
+                }
+              }
+
+              const outpoint = `${channelClaim.txid}:${channelClaim.nout}`;
+              if (blacklistedMap[outpoint] || filteredMap[outpoint]) {
+                return false;
+              }
+
+              if (!showMatureContent) {
+                const claimIsMature = isClaimNsfw(channelClaim);
+                if (claimIsMature) {
+                  return false;
+                }
+              }
+            }
+
+            return !blockedChannels.includes(comment.channel_url);
+          })
+        : [];
     }
   );

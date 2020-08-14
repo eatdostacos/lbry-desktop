@@ -14,7 +14,8 @@ const select = (state, props) => {
   const { search } = props.location;
   const urlParams = new URLSearchParams(search);
   const linkedCommentId =
-    Number(urlParams.get('lc')) || '979ee72cc379497453298b32e25ea8ebf201f4f11654b21451c2b35f2bafbdd0';
+    // Number(urlParams.get('lc')) || '979ee72cc379497453298b32e25ea8ebf201f4f11654b21451c2b35f2bafbdd0'; // parent comment
+    Number(urlParams.get('lc')) || '2f35e9f9bb9edabb3620ef1f175f69394aa88de1966cb7f4ba7df9a4de220751'; // child comment
 
   return {
     myChannels: selectMyChannelClaims(state),

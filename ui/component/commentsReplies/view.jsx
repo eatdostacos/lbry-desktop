@@ -9,25 +9,22 @@ type Props = {
   uri: string,
   claimIsMine: boolean,
   myChannels: ?Array<ChannelClaim>,
-  linkedCommentId: string,
-  parentId: string,
+  linkedComment?: string,
 };
 
 function CommentsReplies(props: Props) {
-  const { uri, comments, claimIsMine, myChannels, linkedCommentId, parentId } = props;
+  const { uri, comments, claimIsMine, myChannels, linkedComment } = props;
 
   const [expanded, setExpanded] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(3);
-  if (!comments) return null;
+  const sortedComments = comments ? [...comments].reverse() : [];
 
-  const totalComments = comments && comments.length;
+  const linkedCommentId = linkedComment ? linkedComment.comment_id : '';
 
-  // const linkedCommentId = '979ee72cc379497453298b32e25ea8ebf201f4f11654b21451c2b35f2bafbdd0';
-  // if linkedCommentId
-  //    find linkedCommentId
-  // else
-  // <comment id={linked_id}
+  const commentsIndexOfLInked = comments && sortedComments.findIndex(e => e.comment_id === linkedCommentId);
+  // const totalComments = comments && comments.length;
+
   // todo: implement comment_list --mine in SDK so redux can grab with selectCommentIsMine
   const isMyComment = (channelId: string) => {
     if (myChannels != null && channelId != null) {
@@ -40,10 +37,17 @@ function CommentsReplies(props: Props) {
     return false;
   };
 
-  function getIndexOfLinkedComment(comments, commentId) {
-    return comments.findIndex(e => e.comment_id === commentId);
-  }
-  const displayedComments = (comments && comments.reverse().slice(start, end)) || [];
+  React.useEffect(() => {
+    if (setStart && setEnd && setExpanded && linkedCommentId && commentsIndexOfLInked > -1) {
+      setStart(commentsIndexOfLInked);
+      setEnd(commentsIndexOfLInked + 1);
+      setExpanded(true);
+    }
+  }, [setStart, setEnd, setExpanded, linkedCommentId, commentsIndexOfLInked]);
+
+  if (!comments) return null;
+
+  const displayedComments = sortedComments.slice(start, end);
 
   return (
     <div className={'comment__replies-container'}>
@@ -75,7 +79,7 @@ function CommentsReplies(props: Props) {
                 timePosted={comment.timestamp * 1000}
                 claimIsMine={claimIsMine}
                 commentIsMine={comment.channel_id && isMyComment(comment.channel_id)}
-                highlighted={comment.comment_id === linkedCommentId}
+                linkedComment={linkedComment}
               />
             );
           })}
